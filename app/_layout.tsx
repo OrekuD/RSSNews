@@ -3,6 +3,7 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -17,8 +18,7 @@ export {
 } from "expo-router";
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)",
+  initialRouteName: "index",
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -26,10 +26,13 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SFProDisplay: require("../assets/fonts/SFProDisplay-Regular.ttf"),
-    SFProDisplayMedium: require("../assets/fonts/SFProDisplay-Medium.ttf"),
-    SFProDisplayBold: require("../assets/fonts/SFProDisplay-Bold.ttf"),
-    SFProDisplaySemibold: require("../assets/fonts/SFProDisplay-Semibold.ttf"),
+    SFProDisplay: require("../assets/fonts/SF-Pro-Display-Regular.otf"),
+    SFProDisplayMedium: require("../assets/fonts/SF-Pro-Display-Medium.otf"),
+    SFProDisplaySemibold: require("../assets/fonts/SF-Pro-Display-Semibold.otf"),
+    SFProDisplayBold: require("../assets/fonts/SF-Pro-Display-Bold.otf"),
+    SFProDisplayHeavy: require("../assets/fonts/SF-Pro-Display-Heavy.otf"),
+    SFProDisplayBlack: require("../assets/fonts/SF-Pro-Display-Black.otf"),
+    ...FontAwesome.font,
   });
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
@@ -55,7 +58,11 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
         <Stack.Screen name="index" />
         <Stack.Screen name="settings" options={{ presentation: "modal" }} />
         <Stack.Screen name="news/[id]" options={{ presentation: "modal" }} />

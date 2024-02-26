@@ -1,4 +1,5 @@
 import { breakpoints } from "./breakpoints";
+import { fontWeightPlugin } from "./fontWeightPlugin";
 import { darkTheme, lightTheme } from "./themes";
 import { UnistylesRegistry } from "react-native-unistyles";
 
@@ -21,4 +22,5 @@ UnistylesRegistry.addBreakpoints(breakpoints)
   })
   .addConfig({
     adaptiveThemes: true,
+    plugins: [fontWeightPlugin],
   });
