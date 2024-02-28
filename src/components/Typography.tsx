@@ -3,7 +3,7 @@ import { Text as DefaultText } from "react-native";
 import { useStyles } from "react-native-unistyles";
 
 type TypographyProps = DefaultText["props"] & {
-  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
   color?: "primary" | "secondary";
   fontWeight?: "400" | "500" | "600" | "700" | "800" | "900";
 };
@@ -28,8 +28,10 @@ export default function Typography({
       case "lg":
         return 20;
       case "xl":
-        return 28;
+        return 24;
       case "2xl":
+        return 28;
+      case "3xl":
         return 48;
       default:
         return 16;
