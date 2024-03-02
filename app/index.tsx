@@ -4,16 +4,21 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   View,
+  useColorScheme,
   useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
-import { createStyleSheet, useStyles } from "react-native-unistyles";
+import {
+  UnistylesRuntime,
+  createStyleSheet,
+  useStyles,
+} from "react-native-unistyles";
 import React from "react";
 import { Feed, NewsItem } from "@/src/types/types";
-import { AntDesign, Entypo, Octicons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import { XMLParser } from "fast-xml-parser";
-import FeedItem from "@/src/components/FeedItem";
+import FeedCard from "@/src/components/FeedCard";
 import { BlurView } from "expo-blur";
 import { format } from "date-fns";
 import Animated, {
@@ -25,9 +30,12 @@ import Animated, {
 import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import ActiveFeedIndicator from "@/src/components/ActiveFeedIndicator";
 import FeedSelector from "@/src/components/FeedSelector";
+import useSettingsStore from "@/src/store/useSettingsStore";
 
 export default function Screen() {
   const { styles, theme } = useStyles(stylesheet);
+  const colorScheme = useColorScheme();
+  const settingsStore = useSettingsStore(({ settings }) => settings);
   const { top, bottom } = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const flashlistRef = React.useRef<FlashList<NewsItem>>(null);
@@ -93,7 +101,16 @@ export default function Screen() {
     .onFinalize(() => {
       runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Heavy);
     });
+
   const composed = Gesture.Race(pan, tap);
+
+  const themeMode = React.useMemo(() => {
+    if (settingsStore.themeMode === "system") {
+      return colorScheme;
+    }
+
+    return settingsStore.themeMode;
+  }, [settingsStore.themeMode, UnistylesRuntime.hasAdaptiveThemes]);
 
   async function test() {
     try {
@@ -134,47 +151,78 @@ export default function Screen() {
 
   return (
     <View style={styles.container}>
-      <BlurView
-        intensity={24}
-        style={[
-          styles.blurView,
-          {
-            top: 0,
-            height: top + 12,
-          },
-        ]}
-      />
-      <BlurView
-        intensity={24}
-        style={[
-          styles.blurView,
-          {
-            bottom: 0,
-            height: bottom + 76,
-            paddingBottom: bottom + 18,
-          },
-        ]}
-      >
-        <GestureDetector gesture={composed}>
-          <Animated.View style={[styles.nextButton, nextButtonAnimatedStyle]}>
-            <Typography size="xl" fontWeight="700">
-              Next
-            </Typography>
-            <AntDesign
-              name="arrowdown"
-              size={24}
-              color={theme.colors.typography}
-            />
-          </Animated.View>
-        </GestureDetector>
-        <FeedSelector translateX={feedSelectorSharedValue} />
-      </BlurView>
+      {settingsStore.progressiveBlursEnabled ? (
+        <BlurView
+          intensity={24}
+          tint={themeMode === "light" ? "systemThickMaterialLight" : undefined}
+          style={[
+            styles.blurView,
+            {
+              top: 0,
+              height: top + 12,
+            },
+          ]}
+        />
+      ) : null}
+      {settingsStore.progressiveBlursEnabled ? (
+        <BlurView
+          intensity={24}
+          tint={themeMode === "light" ? "systemThickMaterialLight" : undefined}
+          style={[
+            styles.blurView,
+            {
+              bottom: 0,
+              height: bottom + 68,
+              paddingBottom: bottom + 24,
+            },
+          ]}
+        >
+          <GestureDetector gesture={composed}>
+            <Animated.View style={[styles.nextButton, nextButtonAnimatedStyle]}>
+              <Typography size="xl" fontWeight="700">
+                Next
+              </Typography>
+              <AntDesign
+                name="arrowdown"
+                size={24}
+                color={theme.colors.typography}
+              />
+            </Animated.View>
+          </GestureDetector>
+          <FeedSelector translateX={feedSelectorSharedValue} />
+        </BlurView>
+      ) : (
+        <View
+          style={[
+            styles.blurView,
+            {
+              bottom: 0,
+              height: bottom + 68,
+              paddingBottom: bottom + 24,
+            },
+          ]}
+        >
+          <GestureDetector gesture={composed}>
+            <Animated.View style={[styles.nextButton, nextButtonAnimatedStyle]}>
+              <Typography size="xl" fontWeight="700">
+                Next
+              </Typography>
+              <AntDesign
+                name="arrowdown"
+                size={24}
+                color={theme.colors.typography}
+              />
+            </Animated.View>
+          </GestureDetector>
+          <FeedSelector translateX={feedSelectorSharedValue} />
+        </View>
+      )}
 
       <View style={[styles.content]}>
         <FlashList
           data={testData}
           // keyExtractor={({ title }: NewsItem) => title as string}
-          renderItem={({ item }) => <FeedItem feedItem={item} />}
+          renderItem={({ item }) => <FeedCard feedItem={item} />}
           estimatedItemSize={200}
           contentContainerStyle={{
             paddingTop: top + 12,

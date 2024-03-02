@@ -1,6 +1,7 @@
 import React from "react";
 import { Text as DefaultText } from "react-native";
 import { useStyles } from "react-native-unistyles";
+import useSettingsStore from "../store/useSettingsStore";
 
 type TypographyProps = DefaultText["props"] & {
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
@@ -16,6 +17,7 @@ export default function Typography({
   ...props
 }: React.PropsWithChildren<TypographyProps>) {
   const { theme } = useStyles();
+  const settingsStore = useSettingsStore(({ settings }) => settings);
 
   const fontSize = React.useMemo(() => {
     switch (size) {
@@ -38,7 +40,7 @@ export default function Typography({
     }
   }, [size]);
 
-  const fontFamily = React.useMemo(() => {
+  const sanFranciscoFontFamily = React.useMemo(() => {
     switch (fontWeight) {
       case "400":
         return "SFProDisplay";
@@ -58,6 +60,26 @@ export default function Typography({
     }
   }, [fontWeight]);
 
+  const newYorkFontFamily = React.useMemo(() => {
+    switch (fontWeight) {
+      case "400":
+        return "NewYork";
+      case "500":
+        return "NewYorkMedium";
+      case "600":
+        return "NewYorkSemibold";
+      case "700":
+        return "NewYorkBold";
+      case "800":
+        return "NewYorkHeavy";
+      case "900":
+        return "NewYorkBlack";
+
+      default:
+        return "NewYork";
+    }
+  }, [fontWeight]);
+
   const textColor = React.useMemo(() => {
     switch (color) {
       case "primary":
@@ -74,7 +96,10 @@ export default function Typography({
       style={[
         style,
         {
-          fontFamily,
+          fontFamily:
+            settingsStore.fontType === "san-francisco"
+              ? sanFranciscoFontFamily
+              : newYorkFontFamily,
           fontSize,
           color: textColor,
         },

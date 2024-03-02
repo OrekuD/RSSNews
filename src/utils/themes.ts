@@ -6,7 +6,9 @@ export const lightTheme = {
     cardBackground: "#FDFFFF",
     borderColor: "#C0C1C1",
     gray100: "#666666",
+    gray200: "#C5C5C7",
     secondaryButtonBackgroundColor: "#FDFFFF",
+    secondaryBackground: "#FFFFFF",
   },
   margins: {
     sm: 2,
@@ -25,7 +27,9 @@ export const darkTheme = {
     cardBackground: "#201E23",
     borderColor: "#4D4D4F",
     gray100: "#A6A5A7",
+    gray200: "#59595D",
     secondaryButtonBackgroundColor: "#1A1A1D",
+    secondaryBackground: "#1D1D1E",
   },
   margins: {
     sm: 2,

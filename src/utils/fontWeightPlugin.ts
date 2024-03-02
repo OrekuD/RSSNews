@@ -5,7 +5,6 @@ export const fontWeightPlugin: UnistylesPlugin = {
   onParsedStyle: (_key, styles) => {
     if ("fontWeight" in styles) {
       switch (styles.fontWeight) {
-        // add other weights
         case "bold": {
           styles.fontFamily = "SFProDisplayBold";
         }

@@ -21,6 +21,6 @@ UnistylesRegistry.addBreakpoints(breakpoints)
     dark: darkTheme,
   })
   .addConfig({
-    adaptiveThemes: true,
+    initialTheme: "dark",
     plugins: [fontWeightPlugin],
   });
