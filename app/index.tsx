@@ -3,6 +3,7 @@ import { FlashList } from "@shopify/flash-list";
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Platform,
   View,
   useColorScheme,
   useWindowDimensions,
@@ -12,6 +13,7 @@ import * as Haptics from "expo-haptics";
 import {
   UnistylesRuntime,
   createStyleSheet,
+  mq,
   useStyles,
 } from "react-native-unistyles";
 import React from "react";
@@ -31,6 +33,7 @@ import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import ActiveFeedIndicator from "@/src/components/ActiveFeedIndicator";
 import FeedSelector from "@/src/components/FeedSelector";
 import useSettingsStore from "@/src/store/useSettingsStore";
+import useScreenType from "@/src/hooks/useScreenType";
 
 export default function Screen() {
   const { styles, theme } = useStyles(stylesheet);
@@ -49,6 +52,7 @@ export default function Screen() {
   );
   const nextButtonTranslateXStart = useSharedValue(0);
   const flashlistPositionIndex = useSharedValue(0);
+  const { isMobile, isSmallTablet } = useScreenType();
 
   const onNext = React.useCallback(() => {
     if (!flashlistRef.current) return;
@@ -112,6 +116,14 @@ export default function Screen() {
     return settingsStore.themeMode;
   }, [settingsStore.themeMode, UnistylesRuntime.hasAdaptiveThemes]);
 
+  const paddingHorizontal = React.useMemo(() => {
+    if (settingsStore.themeMode === "system") {
+      return colorScheme;
+    }
+
+    return settingsStore.themeMode;
+  }, []);
+
   async function test() {
     try {
       const response = await fetch(
@@ -151,7 +163,7 @@ export default function Screen() {
 
   return (
     <View style={styles.container}>
-      {settingsStore.progressiveBlursEnabled ? (
+      {Platform.OS === "ios" && settingsStore.progressiveBlursEnabled ? (
         <BlurView
           intensity={24}
           tint={themeMode === "light" ? "systemThickMaterialLight" : undefined}
@@ -164,7 +176,7 @@ export default function Screen() {
           ]}
         />
       ) : null}
-      {settingsStore.progressiveBlursEnabled ? (
+      {Platform.OS === "ios" && settingsStore.progressiveBlursEnabled ? (
         <BlurView
           intensity={24}
           tint={themeMode === "light" ? "systemThickMaterialLight" : undefined}
@@ -197,8 +209,8 @@ export default function Screen() {
             styles.blurView,
             {
               bottom: 0,
-              height: bottom + 68,
-              paddingBottom: bottom + 24,
+              minHeight: bottom + 68,
+              paddingBottom: isMobile ? bottom + 24 : 70,
             },
           ]}
         >
@@ -217,16 +229,16 @@ export default function Screen() {
           <FeedSelector translateX={feedSelectorSharedValue} />
         </View>
       )}
-
-      <View style={[styles.content]}>
+      <View style={styles.content}>
         <FlashList
           data={testData}
-          // keyExtractor={({ title }: NewsItem) => title as string}
+          keyExtractor={({ title }) => title}
           renderItem={({ item }) => <FeedCard feedItem={item} />}
           estimatedItemSize={200}
           contentContainerStyle={{
-            paddingTop: top + 12,
-            paddingBottom: bottom + 100,
+            paddingTop: isMobile ? top + 12 : 54,
+            paddingBottom: isMobile ? bottom + 100 : 150,
+            paddingHorizontal: theme.margins["2xl"],
           }}
           onScroll={onScroll}
           scrollEventThrottle={16}
@@ -236,14 +248,11 @@ export default function Screen() {
           )}
           ListHeaderComponent={
             <View>
-              <Typography
-                size="3xl"
-                fontWeight="900"
-                style={{
-                  width: "60%",
-                }}
-              >
-                Good Morning
+              <Typography size="3xl" fontWeight="900">
+                Good
+              </Typography>
+              <Typography size="3xl" fontWeight="900">
+                Morning
               </Typography>
               <View
                 style={[
@@ -275,7 +284,14 @@ const stylesheet = createStyleSheet((theme) => ({
   },
   content: {
     flex: 1,
-    paddingHorizontal: theme.margins["2xl"],
+    alignSelf: "center",
+    width: {
+      [mq.only.width(0, 480)]: "100%",
+      [mq.only.width(480, 768)]: "75%",
+      [mq.only.width(768, 1024)]: "70%",
+      [mq.only.width(1024, 1440)]: 720,
+      [mq.only.width(1440)]: 920,
+    },
   },
   row: {
     flexDirection: "row",
@@ -289,10 +305,15 @@ const stylesheet = createStyleSheet((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 32,
+    paddingHorizontal: {
+      [mq.only.width(0, 480)]: 32,
+      [mq.only.width(480, 768)]: "6.25%",
+      [mq.only.width(768, 1024)]: "7.5%",
+      [mq.only.width(1024, 1440)]: (UnistylesRuntime.screen.width - 720) * 0.2,
+      [mq.only.width(1440)]: (UnistylesRuntime.screen.width - 920) * 0.4,
+    },
   },
   nextButton: {
-    // position: "absolute",
     width: 120,
     height: 52,
     borderRadius: 52 / 2,

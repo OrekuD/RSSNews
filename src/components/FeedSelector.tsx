@@ -36,7 +36,7 @@ export default function FeedSelector(props: FeedSelectorProps) {
           <DropdownMenu.CheckboxItem
             value={feedStore.selectedFeedId === Feed.ForYou}
             onValueChange={(next) => {
-              if (feedStore.selectedFeedId !== Feed.ForYou && next === "on") {
+              if (next === "on") {
                 feedStore.setSelectedFeedId(Feed.ForYou);
               }
             }}
@@ -55,10 +55,7 @@ export default function FeedSelector(props: FeedSelectorProps) {
           <DropdownMenu.CheckboxItem
             value={feedStore.selectedFeedId === Feed.ReadLater}
             onValueChange={(next) => {
-              if (
-                feedStore.selectedFeedId !== Feed.ReadLater &&
-                next === "on"
-              ) {
+              if (next === "on") {
                 feedStore.setSelectedFeedId(Feed.ReadLater);
               }
             }}
@@ -81,7 +78,7 @@ export default function FeedSelector(props: FeedSelectorProps) {
               <DropdownMenu.CheckboxItem
                 value={feed.id === feedStore.selectedFeedId}
                 onValueChange={(next) => {
-                  if (feedStore.selectedFeedId !== feed.id && next === "on") {
+                  if (next === "on") {
                     feedStore.setSelectedFeedId(feed.id);
                   }
                 }}
@@ -146,20 +143,7 @@ export default function FeedSelector(props: FeedSelectorProps) {
 }
 
 const stylesheet = createStyleSheet((theme) => ({
-  //   feedSelector: {
-  //     position: "absolute",
-  //     width: 52,
-  //     height: 52,
-  //     borderRadius: 52 / 2,
-  //     backgroundColor: theme.colors.secondaryButtonBackgroundColor,
-  //     zIndex: 4,
-  //     borderWidth: 1,
-  //     borderColor: theme.colors.borderColor,
-  //     alignItems: "center",
-  //     justifyContent: "center",
-  //   },
   feedSelector: {
-    // position: "absolute",
     width: 52,
     height: 52,
     borderRadius: 52 / 2,

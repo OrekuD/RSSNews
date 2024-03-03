@@ -15,7 +15,7 @@ const useFeedStore = create(
       setSelectedFeedId: (selectedFeedId: Feed) => set({ selectedFeedId }),
     }),
     {
-      name: "feed-store",
+      name: "feed",
       storage: createJSONStorage(() => mmkvStorage),
     }
   )

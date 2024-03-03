@@ -1,19 +1,21 @@
 import * as DropdownMenu from "zeego/dropdown-menu";
 import feeds from "../constants/feeds";
 import React from "react";
-import { Entypo } from "@expo/vector-icons";
+import { AntDesign, Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { View } from "react-native";
 import { useStyles, createStyleSheet } from "react-native-unistyles";
 import useFeedStore from "../store/useFeedStore";
 import { Feed } from "../types/types";
 import Typography from "./Typography";
+import webDropdownStyleSheet from "../styles/webDropdownStyleSheet";
 
 type ActiveFeedIndicatorProps = {};
 
 export default function ActiveFeedIndicator(props: ActiveFeedIndicatorProps) {
   const feedStore = useFeedStore();
   const { styles, theme } = useStyles(stylesheet);
+  const { styles: webStyles } = useStyles(webDropdownStyleSheet);
 
   const selectedFeed = React.useMemo(
     () => feeds.find((feed) => feed.id === feedStore.selectedFeedId),
@@ -34,19 +36,27 @@ export default function ActiveFeedIndicator(props: ActiveFeedIndicatorProps) {
           />
         </View>
       </DropdownMenu.Trigger>
-      <DropdownMenu.Content>
+      <DropdownMenu.Content
+        style={webStyles.dropdownContent}
+        align="end"
+        alignOffset={-8}
+        sideOffset={6}
+      >
         <DropdownMenu.Group>
           <DropdownMenu.CheckboxItem
             value={feedStore.selectedFeedId === Feed.ForYou}
             onValueChange={(next) => {
-              if (feedStore.selectedFeedId !== Feed.ForYou && next === "on") {
+              if (next === "on") {
                 feedStore.setSelectedFeedId(Feed.ForYou);
               }
             }}
             key="for-you"
+            style={webStyles.dropdownItem}
           >
-            <DropdownMenu.ItemTitle>For You</DropdownMenu.ItemTitle>
-            <DropdownMenu.ItemSubtitle>
+            <DropdownMenu.ItemTitle style={webStyles.dropdownTitle}>
+              For You
+            </DropdownMenu.ItemTitle>
+            <DropdownMenu.ItemSubtitle style={webStyles.dropdownSubTitle}>
               articles from across all categories
             </DropdownMenu.ItemSubtitle>
             <DropdownMenu.ItemIcon
@@ -54,21 +64,29 @@ export default function ActiveFeedIndicator(props: ActiveFeedIndicatorProps) {
                 name: "heart.text.square",
               }}
             />
+            {feedStore.selectedFeedId === Feed.ForYou ? (
+              <AntDesign
+                name="checkcircle"
+                size={24}
+                color={theme.colors.typography}
+                style={webStyles.dropdownIcon}
+              />
+            ) : null}
           </DropdownMenu.CheckboxItem>
           <DropdownMenu.CheckboxItem
             value={feedStore.selectedFeedId === Feed.ReadLater}
             onValueChange={(next) => {
-              if (
-                feedStore.selectedFeedId !== Feed.ReadLater &&
-                next === "on"
-              ) {
+              if (next === "on") {
                 feedStore.setSelectedFeedId(Feed.ReadLater);
               }
             }}
             key="read-later"
+            style={webStyles.dropdownItem}
           >
-            <DropdownMenu.ItemTitle>Read Later</DropdownMenu.ItemTitle>
-            <DropdownMenu.ItemSubtitle>
+            <DropdownMenu.ItemTitle style={webStyles.dropdownTitle}>
+              Read Later
+            </DropdownMenu.ItemTitle>
+            <DropdownMenu.ItemSubtitle style={webStyles.dropdownSubTitle}>
               articles saved to read later
             </DropdownMenu.ItemSubtitle>
             <DropdownMenu.ItemIcon
@@ -76,6 +94,14 @@ export default function ActiveFeedIndicator(props: ActiveFeedIndicatorProps) {
                 name: "bookmark",
               }}
             />
+            {feedStore.selectedFeedId === Feed.ReadLater ? (
+              <AntDesign
+                name="checkcircle"
+                size={24}
+                color={theme.colors.typography}
+                style={webStyles.dropdownIcon}
+              />
+            ) : null}
           </DropdownMenu.CheckboxItem>
         </DropdownMenu.Group>
         <DropdownMenu.Group>
@@ -84,42 +110,79 @@ export default function ActiveFeedIndicator(props: ActiveFeedIndicatorProps) {
               <DropdownMenu.CheckboxItem
                 value={feed.id === feedStore.selectedFeedId}
                 onValueChange={(next) => {
-                  if (feedStore.selectedFeedId !== feed.id && next === "on") {
+                  if (next === "on") {
                     feedStore.setSelectedFeedId(feed.id);
                   }
                 }}
                 key={feed.name}
+                style={webStyles.dropdownItem}
               >
-                <DropdownMenu.ItemTitle>{feed.name}</DropdownMenu.ItemTitle>
+                <DropdownMenu.ItemTitle style={webStyles.dropdownTitle}>
+                  {feed.name}
+                </DropdownMenu.ItemTitle>
                 <DropdownMenu.ItemIcon
                   ios={{
                     name: feed.iosIconName,
                   }}
                 />
+                {feed.id === feedStore.selectedFeedId ? (
+                  <AntDesign
+                    name="checkcircle"
+                    size={24}
+                    color={theme.colors.typography}
+                    style={webStyles.dropdownIcon}
+                  />
+                ) : null}
               </DropdownMenu.CheckboxItem>
             );
           })}
         </DropdownMenu.Group>
         <DropdownMenu.Sub>
-          <DropdownMenu.ItemTitle>Iå</DropdownMenu.ItemTitle>
-          <DropdownMenu.SubTrigger key="sub">
-            <DropdownMenu.ItemTitle>All Feeds</DropdownMenu.ItemTitle>
+          <DropdownMenu.SubTrigger
+            key="sub"
+            style={webStyles.dropdownSubTrigger}
+          >
+            <DropdownMenu.ItemTitle style={webStyles.dropdownTitle}>
+              All Feeds
+            </DropdownMenu.ItemTitle>
             <DropdownMenu.ItemIcon
               ios={{
                 name: "tag",
               }}
             />
+            <Entypo
+              name="chevron-right"
+              size={24}
+              color={theme.colors.typography}
+              style={webStyles.dropdownSubTriggerIcon}
+            />
           </DropdownMenu.SubTrigger>
-          <DropdownMenu.SubContent>
-            <DropdownMenu.Item key="4">
-              <DropdownMenu.ItemTitle>Ok</DropdownMenu.ItemTitle>
-            </DropdownMenu.Item>
+          <DropdownMenu.SubContent style={webStyles.dropdownSubContent}>
+            {Array(10)
+              .fill(null)
+              .map((_, index) => (
+                <DropdownMenu.Item
+                  key={index + 1 + ""}
+                  style={[
+                    webStyles.dropdownSubContentItem,
+                    {
+                      borderTopWidth: index === 0 ? 0 : 1,
+                    },
+                  ]}
+                >
+                  <DropdownMenu.ItemTitle style={webStyles.dropdownTitle}>
+                    label
+                  </DropdownMenu.ItemTitle>
+                </DropdownMenu.Item>
+              ))}
           </DropdownMenu.SubContent>
         </DropdownMenu.Sub>
         <DropdownMenu.Group>
-          <DropdownMenu.Item key="manage">
-            <DropdownMenu.ItemTitle>Manage</DropdownMenu.ItemTitle>
-            <DropdownMenu.ItemSubtitle>
+          <DropdownMenu.Item key="manage" style={webStyles.dropdownItem}>
+            <DropdownMenu.ItemTitle style={webStyles.dropdownTitle}>
+              Manage
+            </DropdownMenu.ItemTitle>
+            <DropdownMenu.ItemSubtitle style={webStyles.dropdownSubTitle}>
               add and remove feeds
             </DropdownMenu.ItemSubtitle>
             <DropdownMenu.ItemIcon
@@ -131,9 +194,17 @@ export default function ActiveFeedIndicator(props: ActiveFeedIndicatorProps) {
           <DropdownMenu.Item
             key="settings"
             onSelect={() => router.push("/settings")}
+            style={[
+              webStyles.dropdownItem,
+              {
+                borderBottomWidth: 0,
+              },
+            ]}
           >
-            <DropdownMenu.ItemTitle>Settings</DropdownMenu.ItemTitle>
-            <DropdownMenu.ItemSubtitle>
+            <DropdownMenu.ItemTitle style={webStyles.dropdownTitle}>
+              Settings
+            </DropdownMenu.ItemTitle>
+            <DropdownMenu.ItemSubtitle style={webStyles.dropdownSubTitle}>
               make the app your own
             </DropdownMenu.ItemSubtitle>
             <DropdownMenu.ItemIcon

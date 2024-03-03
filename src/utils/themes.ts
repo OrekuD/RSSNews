@@ -9,6 +9,7 @@ export const lightTheme = {
     gray200: "#C5C5C7",
     secondaryButtonBackgroundColor: "#FDFFFF",
     secondaryBackground: "#FFFFFF",
+    highContrastReadingBackground: "#FFFFFF",
   },
   margins: {
     sm: 2,
@@ -30,6 +31,7 @@ export const darkTheme = {
     gray200: "#59595D",
     secondaryButtonBackgroundColor: "#1A1A1D",
     secondaryBackground: "#1D1D1E",
+    highContrastReadingBackground: "#000000",
   },
   margins: {
     sm: 2,

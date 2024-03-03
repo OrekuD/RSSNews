@@ -5,6 +5,8 @@ import Typography from "./Typography";
 import { format, formatDistance } from "date-fns";
 import { Entypo } from "@expo/vector-icons";
 import * as DropdownMenu from "zeego/dropdown-menu";
+import * as ContextMenu from "zeego/context-menu";
+import { useRouter } from "expo-router";
 
 type FeedCardProps = {
   feedItem: NewsItem;
@@ -12,113 +14,243 @@ type FeedCardProps = {
 
 export default function FeedCard(props: FeedCardProps) {
   const { styles, theme } = useStyles(stylesheet);
+  const router = useRouter();
 
   return (
-    <View style={styles.container}>
-      <Typography size="lg" fontWeight="600" numberOfLines={2}>
-        {props.feedItem.title}
-      </Typography>
-      <View style={styles.footer}>
-        <Typography color="secondary" size="md" fontWeight="500">
-          {formatDistance(new Date(props.feedItem.pubDate), new Date(), {
-            addSuffix: true,
-          })}
-        </Typography>
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger action="press">
-            <Entypo
-              name="dots-three-horizontal"
-              size={24}
-              color={theme.colors.gray100}
+    <ContextMenu.Root>
+      <ContextMenu.Trigger>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => {
+            router.push("/news/test");
+          }}
+          style={styles.container}
+        >
+          <Typography size="lg" fontWeight="600" numberOfLines={2}>
+            {props.feedItem.title}
+          </Typography>
+          <View style={styles.footer}>
+            <Typography color="secondary" size="md" fontWeight="500">
+              {formatDistance(new Date(props.feedItem.pubDate), new Date(), {
+                addSuffix: true,
+              })}
+            </Typography>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={(e) => e.stopPropagation()}
+            >
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger action="press">
+                  <Entypo
+                    name="dots-three-horizontal"
+                    size={24}
+                    color={theme.colors.gray100}
+                  />
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  <DropdownMenu.Group>
+                    <DropdownMenu.Item key="smart-summary">
+                      <DropdownMenu.ItemTitle>
+                        Smart Summary
+                      </DropdownMenu.ItemTitle>
+                      <DropdownMenu.ItemIcon
+                        ios={{
+                          name: "wand.and.stars",
+                        }}
+                      />
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item key="improve-title">
+                      <DropdownMenu.ItemTitle>
+                        Improve Title
+                      </DropdownMenu.ItemTitle>
+                      <DropdownMenu.ItemIcon
+                        ios={{
+                          name: "wand.and.stars.inverse",
+                        }}
+                      />
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Group>
+                  <DropdownMenu.Group>
+                    <DropdownMenu.Item key="read-out-synopsis">
+                      <DropdownMenu.ItemTitle>
+                        Read Out Synopsis
+                      </DropdownMenu.ItemTitle>
+                      <DropdownMenu.ItemIcon
+                        ios={{
+                          name: "waveform",
+                        }}
+                      />
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Group>
+                  <DropdownMenu.Group>
+                    <DropdownMenu.Item key="read-later">
+                      <DropdownMenu.ItemTitle>
+                        Read Later
+                      </DropdownMenu.ItemTitle>
+                      <DropdownMenu.ItemIcon
+                        ios={{
+                          name: "bookmark",
+                        }}
+                      />
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item key="mark-as-read">
+                      <DropdownMenu.ItemTitle>
+                        Mark as Read
+                      </DropdownMenu.ItemTitle>
+                      <DropdownMenu.ItemIcon
+                        ios={{
+                          name: "text.book.closed",
+                        }}
+                      />
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Group>
+                  <DropdownMenu.Group>
+                    <DropdownMenu.Item key="not-interested" destructive>
+                      <DropdownMenu.ItemTitle>
+                        Not interested
+                      </DropdownMenu.ItemTitle>
+                      <DropdownMenu.ItemIcon
+                        ios={{
+                          name: "minus.circle",
+                        }}
+                      />
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Group>
+                  <DropdownMenu.Group horizontal>
+                    <DropdownMenu.Item key="share">
+                      <DropdownMenu.ItemTitle>Share</DropdownMenu.ItemTitle>
+                      <DropdownMenu.ItemIcon
+                        ios={{
+                          name: "square.and.arrow.up",
+                        }}
+                      />
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item key="link">
+                      <DropdownMenu.ItemTitle>link</DropdownMenu.ItemTitle>
+                      <DropdownMenu.ItemIcon
+                        ios={{
+                          name: "link",
+                        }}
+                      />
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item key="open-browser">
+                      <DropdownMenu.ItemTitle>
+                        Open Browser
+                      </DropdownMenu.ItemTitle>
+                      <DropdownMenu.ItemIcon
+                        ios={{
+                          name: "safari",
+                        }}
+                      />
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item key="list">
+                      <DropdownMenu.ItemTitle>List</DropdownMenu.ItemTitle>
+                      <DropdownMenu.ItemIcon
+                        ios={{
+                          name: "list.bullet.rectangle.portrait",
+                        }}
+                      />
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Group>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </ContextMenu.Trigger>
+      <ContextMenu.Content>
+        <ContextMenu.Group>
+          <ContextMenu.Item key="smart-summary">
+            <ContextMenu.ItemTitle>Smart Summary</ContextMenu.ItemTitle>
+            <ContextMenu.ItemIcon
+              ios={{
+                name: "wand.and.stars",
+              }}
             />
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content>
-            <DropdownMenu.Group>
-              <DropdownMenu.Item key="smart-summary">
-                <DropdownMenu.ItemTitle>Smart Summary</DropdownMenu.ItemTitle>
-                <DropdownMenu.ItemIcon
-                  ios={{
-                    name: "wand.and.stars",
-                  }}
-                />
-              </DropdownMenu.Item>
-              <DropdownMenu.Item key="improve-title">
-                <DropdownMenu.ItemTitle>Improve Title</DropdownMenu.ItemTitle>
-                <DropdownMenu.ItemIcon
-                  ios={{
-                    name: "wand.and.stars.inverse",
-                  }}
-                />
-              </DropdownMenu.Item>
-            </DropdownMenu.Group>
-            <DropdownMenu.Group>
-              <DropdownMenu.Item key="read-out-synopsis">
-                <DropdownMenu.ItemTitle>
-                  Read Out Synopsis
-                </DropdownMenu.ItemTitle>
-                <DropdownMenu.ItemIcon
-                  ios={{
-                    name: "waveform",
-                  }}
-                />
-              </DropdownMenu.Item>
-            </DropdownMenu.Group>
-            <DropdownMenu.Group>
-              <DropdownMenu.Item key="read-later">
-                <DropdownMenu.ItemTitle>Read Later</DropdownMenu.ItemTitle>
-                <DropdownMenu.ItemIcon
-                  ios={{
-                    name: "bookmark",
-                  }}
-                />
-              </DropdownMenu.Item>
-              <DropdownMenu.Item key="mark-as-read">
-                <DropdownMenu.ItemTitle>Mark as Read</DropdownMenu.ItemTitle>
-                <DropdownMenu.ItemIcon
-                  ios={{
-                    name: "text.book.closed",
-                  }}
-                />
-              </DropdownMenu.Item>
-            </DropdownMenu.Group>
-            <DropdownMenu.Group horizontal>
-              <DropdownMenu.Item key="share">
-                <DropdownMenu.ItemTitle>Share</DropdownMenu.ItemTitle>
-                <DropdownMenu.ItemIcon
-                  ios={{
-                    name: "square.and.arrow.up",
-                  }}
-                />
-              </DropdownMenu.Item>
-              <DropdownMenu.Item key="link">
-                <DropdownMenu.ItemTitle>link</DropdownMenu.ItemTitle>
-                <DropdownMenu.ItemIcon
-                  ios={{
-                    name: "link",
-                  }}
-                />
-              </DropdownMenu.Item>
-              <DropdownMenu.Item key="open-browser">
-                <DropdownMenu.ItemTitle>Open Browser</DropdownMenu.ItemTitle>
-                <DropdownMenu.ItemIcon
-                  ios={{
-                    name: "safari",
-                  }}
-                />
-              </DropdownMenu.Item>
-              <DropdownMenu.Item key="list">
-                <DropdownMenu.ItemTitle>List</DropdownMenu.ItemTitle>
-                <DropdownMenu.ItemIcon
-                  ios={{
-                    name: "list.bullet.rectangle.portrait",
-                  }}
-                />
-              </DropdownMenu.Item>
-            </DropdownMenu.Group>
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
-      </View>
-    </View>
+          </ContextMenu.Item>
+          <ContextMenu.Item key="improve-title">
+            <ContextMenu.ItemTitle>Improve Title</ContextMenu.ItemTitle>
+            <ContextMenu.ItemIcon
+              ios={{
+                name: "wand.and.stars.inverse",
+              }}
+            />
+          </ContextMenu.Item>
+        </ContextMenu.Group>
+        <ContextMenu.Group>
+          <ContextMenu.Item key="read-out-synopsis">
+            <ContextMenu.ItemTitle>Read Out Synopsis</ContextMenu.ItemTitle>
+            <ContextMenu.ItemIcon
+              ios={{
+                name: "waveform",
+              }}
+            />
+          </ContextMenu.Item>
+        </ContextMenu.Group>
+        <ContextMenu.Group>
+          <ContextMenu.Item key="read-later">
+            <ContextMenu.ItemTitle>Read Later</ContextMenu.ItemTitle>
+            <ContextMenu.ItemIcon
+              ios={{
+                name: "bookmark",
+              }}
+            />
+          </ContextMenu.Item>
+          <ContextMenu.Item key="mark-as-read">
+            <ContextMenu.ItemTitle>Mark as Read</ContextMenu.ItemTitle>
+            <ContextMenu.ItemIcon
+              ios={{
+                name: "text.book.closed",
+              }}
+            />
+          </ContextMenu.Item>
+        </ContextMenu.Group>
+        <ContextMenu.Group>
+          <ContextMenu.Item key="not-interested" destructive>
+            <ContextMenu.ItemTitle>Not interested</ContextMenu.ItemTitle>
+            <ContextMenu.ItemIcon
+              ios={{
+                name: "minus.circle",
+              }}
+            />
+          </ContextMenu.Item>
+        </ContextMenu.Group>
+        <ContextMenu.Group horizontal>
+          <ContextMenu.Item key="share">
+            <ContextMenu.ItemTitle>Share</ContextMenu.ItemTitle>
+            <ContextMenu.ItemIcon
+              ios={{
+                name: "square.and.arrow.up",
+              }}
+            />
+          </ContextMenu.Item>
+          <ContextMenu.Item key="link">
+            <ContextMenu.ItemTitle>link</ContextMenu.ItemTitle>
+            <ContextMenu.ItemIcon
+              ios={{
+                name: "link",
+              }}
+            />
+          </ContextMenu.Item>
+          <ContextMenu.Item key="open-browser">
+            <ContextMenu.ItemTitle>Open Browser</ContextMenu.ItemTitle>
+            <ContextMenu.ItemIcon
+              ios={{
+                name: "safari",
+              }}
+            />
+          </ContextMenu.Item>
+          <ContextMenu.Item key="list">
+            <ContextMenu.ItemTitle>List</ContextMenu.ItemTitle>
+            <ContextMenu.ItemIcon
+              ios={{
+                name: "list.bullet.rectangle.portrait",
+              }}
+            />
+          </ContextMenu.Item>
+        </ContextMenu.Group>
+      </ContextMenu.Content>
+    </ContextMenu.Root>
   );
 }
 
