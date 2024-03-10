@@ -1,18 +1,18 @@
 import { create } from "zustand";
-import { Feed } from "../types/types";
+import { Feed, NewsItem } from "../types/types";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { mmkvStorage } from "./storage";
 
 type FeedStore = {
-  selectedFeedId: Feed;
-  setSelectedFeedId: (selectedFeedId: Feed) => void;
+  items: Array<NewsItem>;
+  setItems: (items: Array<NewsItem>) => void;
 };
 
 const useFeedStore = create(
   persist<FeedStore>(
     (set) => ({
-      selectedFeedId: Feed.ForYou,
-      setSelectedFeedId: (selectedFeedId: Feed) => set({ selectedFeedId }),
+      items: [],
+      setItems: (items: Array<NewsItem>) => set({ items }),
     }),
     {
       name: "feed",

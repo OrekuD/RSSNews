@@ -110,7 +110,14 @@ export default function ArticlesSettings() {
           break;
       }
     },
-    []
+    [
+      articlesSettingsStore.settings.autoHideReadArticlesEnabled,
+      articlesSettingsStore.settings.autoRemoveFromReadLaterEnabled,
+      articlesSettingsStore.settings.highContrastReaderBackgroundEnabled,
+      articlesSettingsStore.settings.oneSentenceSmartSummariesEnabled,
+      articlesSettingsStore.settings.scrollToMarkReadEnabled,
+      articlesSettingsStore.settings.faviconsEnabled,
+    ]
   );
 
   return (
@@ -260,7 +267,7 @@ export default function ArticlesSettings() {
             </Typography>
             <Switch
               value={getValue(option.type)}
-              onValueChange={(value) => {
+              onValueChange={() => {
                 articlesSettingsStore.updateSetting({ setting: option.type });
               }}
               trackColor={{

@@ -10,6 +10,7 @@ export const lightTheme = {
     secondaryButtonBackgroundColor: "#FDFFFF",
     secondaryBackground: "#FFFFFF",
     highContrastReadingBackground: "#FFFFFF",
+    backdrop: "rgba(0, 0, 0, 0.8)",
   },
   margins: {
     sm: 2,
@@ -32,6 +33,7 @@ export const darkTheme = {
     secondaryButtonBackgroundColor: "#1A1A1D",
     secondaryBackground: "#1D1D1E",
     highContrastReadingBackground: "#000000",
+    backdrop: "rgba(0, 0, 0, 0.8)",
   },
   margins: {
     sm: 2,

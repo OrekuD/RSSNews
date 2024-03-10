@@ -26,7 +26,7 @@ export default function Typography({
       case "sm":
         return 14;
       case "md":
-        return 16;
+        return 17;
       case "lg":
         return 20;
       case "xl":

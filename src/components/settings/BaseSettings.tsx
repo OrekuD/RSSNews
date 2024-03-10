@@ -4,6 +4,8 @@ import { createStyleSheet, useStyles } from "react-native-unistyles";
 import Typography from "../Typography";
 import * as DropdownMenu from "zeego/dropdown-menu";
 import { UnistylesRuntime } from "react-native-unistyles";
+import webDropdownStyleSheet from "@/src/styles/webDropdownStyleSheet";
+import { AntDesign } from "@expo/vector-icons";
 
 const cardSizes = [
   {
@@ -74,7 +76,8 @@ const themes = [
 ];
 
 export default function BaseSettings() {
-  const { styles } = useStyles(stylesheet);
+  const { styles, theme } = useStyles(stylesheet);
+  const { styles: webStyles } = useStyles(webDropdownStyleSheet);
   const settingsStore = useSettingsStore();
 
   return (
@@ -96,11 +99,22 @@ export default function BaseSettings() {
               </Typography>
             </View>
           </DropdownMenu.Trigger>
-          <DropdownMenu.Content>
-            {fonts.map((font) => {
+          <DropdownMenu.Content
+            style={webStyles.dropdownContent}
+            align="end"
+            alignOffset={-8}
+            sideOffset={6}
+          >
+            {fonts.map((font, index) => {
               return (
                 <DropdownMenu.CheckboxItem
                   value={settingsStore.settings.fontType === font.type}
+                  style={[
+                    webStyles.dropdownCheckboxItem,
+                    {
+                      borderBottomWidth: index === fonts.length - 1 ? 0 : 1,
+                    },
+                  ]}
                   onValueChange={(next) => {
                     if (next === "on") {
                       settingsStore.updateSetting({
@@ -111,12 +125,22 @@ export default function BaseSettings() {
                   }}
                   key={font.type}
                 >
-                  <DropdownMenu.ItemTitle>{font.name}</DropdownMenu.ItemTitle>
+                  <DropdownMenu.ItemTitle style={webStyles.dropdownTitle}>
+                    {font.name}
+                  </DropdownMenu.ItemTitle>
                   <DropdownMenu.ItemIcon
                     ios={{
                       name: "textformat",
                     }}
                   />
+                  {settingsStore.settings.fontType === font.type ? (
+                    <AntDesign
+                      name="checkcircle"
+                      size={24}
+                      color={theme.colors.typography}
+                      style={webStyles.dropdownSubTriggerIcon}
+                    />
+                  ) : null}
                 </DropdownMenu.CheckboxItem>
               );
             })}
@@ -142,11 +166,22 @@ export default function BaseSettings() {
               </Typography>
             </View>
           </DropdownMenu.Trigger>
-          <DropdownMenu.Content>
-            {cardSizes.map((cardSize) => {
+          <DropdownMenu.Content
+            style={webStyles.dropdownContent}
+            align="end"
+            alignOffset={-8}
+            sideOffset={6}
+          >
+            {cardSizes.map((cardSize, index) => {
               return (
                 <DropdownMenu.CheckboxItem
                   value={settingsStore.settings.cardSize === cardSize.type}
+                  style={[
+                    webStyles.dropdownCheckboxItem,
+                    {
+                      borderBottomWidth: index === cardSizes.length - 1 ? 0 : 1,
+                    },
+                  ]}
                   onValueChange={(next) => {
                     if (next === "on") {
                       settingsStore.updateSetting({
@@ -157,10 +192,10 @@ export default function BaseSettings() {
                   }}
                   key={cardSize.type}
                 >
-                  <DropdownMenu.ItemTitle>
+                  <DropdownMenu.ItemTitle style={webStyles.dropdownTitle}>
                     {cardSize.name}
                   </DropdownMenu.ItemTitle>
-                  <DropdownMenu.ItemSubtitle>
+                  <DropdownMenu.ItemSubtitle style={webStyles.dropdownSubTitle}>
                     {cardSize.description}
                   </DropdownMenu.ItemSubtitle>
                   <DropdownMenu.ItemIcon
@@ -168,6 +203,14 @@ export default function BaseSettings() {
                       name: cardSize.iosIconName,
                     }}
                   />
+                  {settingsStore.settings.cardSize === cardSize.type ? (
+                    <AntDesign
+                      name="checkcircle"
+                      size={24}
+                      color={theme.colors.typography}
+                      style={webStyles.dropdownSubTriggerIcon}
+                    />
+                  ) : null}
                 </DropdownMenu.CheckboxItem>
               );
             })}
@@ -193,27 +236,48 @@ export default function BaseSettings() {
               </Typography>
             </View>
           </DropdownMenu.Trigger>
-          <DropdownMenu.Content>
-            {themes.map((theme) => {
+          <DropdownMenu.Content
+            style={webStyles.dropdownContent}
+            align="end"
+            alignOffset={-8}
+            sideOffset={6}
+          >
+            {themes.map((option, index) => {
               return (
                 <DropdownMenu.CheckboxItem
-                  value={settingsStore.settings.themeMode === theme.type}
+                  value={settingsStore.settings.themeMode === option.type}
+                  style={[
+                    webStyles.dropdownCheckboxItem,
+                    {
+                      borderBottomWidth: index === themes.length - 1 ? 0 : 1,
+                    },
+                  ]}
                   onValueChange={(next) => {
                     if (next === "on") {
                       settingsStore.updateSetting({
                         setting: "theme",
-                        mode: theme.type,
+                        mode: option.type,
                       });
                     }
                   }}
-                  key={theme.type}
+                  key={option.type}
                 >
-                  <DropdownMenu.ItemTitle>{theme.name}</DropdownMenu.ItemTitle>
+                  <DropdownMenu.ItemTitle style={webStyles.dropdownTitle}>
+                    {option.name}
+                  </DropdownMenu.ItemTitle>
                   <DropdownMenu.ItemIcon
                     ios={{
-                      name: theme.iosIconName,
+                      name: option.iosIconName,
                     }}
                   />
+                  {settingsStore.settings.themeMode === option.type ? (
+                    <AntDesign
+                      name="checkcircle"
+                      size={24}
+                      color={theme.colors.typography}
+                      style={webStyles.dropdownSubTriggerIcon}
+                    />
+                  ) : null}
                 </DropdownMenu.CheckboxItem>
               );
             })}

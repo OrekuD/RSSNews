@@ -14,7 +14,8 @@ import "../src/utils/unistyles";
 import { useColorScheme } from "@/src/hooks/useColorScheme";
 import useSettingsStore from "@/src/store/useSettingsStore";
 import { UnistylesRuntime } from "react-native-unistyles";
-import { StatusBar } from "react-native";
+import { Platform, StatusBar } from "react-native";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -79,26 +80,44 @@ export default function RootLayout() {
   return <RootLayoutNav />;
 }
 
+const client = new QueryClient();
+
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <GestureHandlerRootView
-      style={{
-        flex: 1,
-      }}
-    >
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-          }}
+    <QueryClientProvider client={client}>
+      <GestureHandlerRootView
+        style={{
+          flex: 1,
+        }}
+      >
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
-          <Stack.Screen name="index" />
-          <Stack.Screen name="settings" options={{ presentation: "modal" }} />
-          <Stack.Screen name="news/[id]" options={{ presentation: "modal" }} />
-        </Stack>
-      </ThemeProvider>
-    </GestureHandlerRootView>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="index" />
+            <Stack.Screen
+              name="settings"
+              options={{
+                presentation:
+                  Platform.OS === "web" ? "transparentModal" : "modal",
+              }}
+            />
+            <Stack.Screen
+              name="news/[id]"
+              options={{
+                presentation:
+                  Platform.OS === "web" ? "transparentModal" : "modal",
+              }}
+            />
+          </Stack>
+        </ThemeProvider>
+      </GestureHandlerRootView>
+    </QueryClientProvider>
   );
 }

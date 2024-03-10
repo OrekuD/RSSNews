@@ -9,7 +9,6 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import * as Haptics from "expo-haptics";
 import {
   UnistylesRuntime,
   createStyleSheet,
@@ -34,25 +33,33 @@ import ActiveFeedIndicator from "@/src/components/ActiveFeedIndicator";
 import FeedSelector from "@/src/components/FeedSelector";
 import useSettingsStore from "@/src/store/useSettingsStore";
 import useScreenType from "@/src/hooks/useScreenType";
+import hapticFeedback from "@/src/utils/hapticFeedback";
+import useGesturesSettingsStore from "@/src/store/useGesturesSettingsStore";
+import useFeedStore from "@/src/store/useFeedStore";
+import useGetFeedItems from "@/src/hooks/queries/useGetFeedItems";
 
 export default function Screen() {
   const { styles, theme } = useStyles(stylesheet);
+  const { width } = useWindowDimensions();
+  const feedSelectorPositions = [-(width - 52 - 64), 0];
+  const nextButtonPositions = [0, (width - 120) / 2 - 30, width - 120 - 64];
   const colorScheme = useColorScheme();
   const settingsStore = useSettingsStore(({ settings }) => settings);
   const { top, bottom } = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
+  const gesturesSettingsStore = useGesturesSettingsStore();
   const flashlistRef = React.useRef<FlashList<NewsItem>>(null);
-  const [testData, setTestData] = React.useState<Array<NewsItem>>([]);
-  const feedSelectorPositions = [-(width - 52 - 64), 0];
   const feedSelectorSharedValue = useSharedValue(feedSelectorPositions[1]);
-  const nextButtonPositions = [0, (width - 120) / 2, width - 120 - 64];
-  const nextButtonSharedValue = useSharedValue(nextButtonPositions[0]);
+  const nextButtonSharedValueX = useSharedValue(nextButtonPositions[0]);
+  const nextButtonSharedValueY = useSharedValue(0);
   const nextButtonPosition = useSharedValue<"left" | "center" | "right">(
     "left"
   );
   const nextButtonTranslateXStart = useSharedValue(0);
+  const nextButtonTranslateYStart = useSharedValue(0);
   const flashlistPositionIndex = useSharedValue(0);
-  const { isMobile, isSmallTablet } = useScreenType();
+  const { isMobile } = useScreenType();
+  const feedStore = useFeedStore();
+  const feedItemsQuery = useGetFeedItems(Feed.ForYou);
 
   const onNext = React.useCallback(() => {
     if (!flashlistRef.current) return;
@@ -64,49 +71,68 @@ export default function Screen() {
     flashlistPositionIndex.value = flashlistPositionIndex.value + 1;
   }, []);
 
+  const scrollToEnd = React.useCallback(() => {
+    if (!flashlistRef.current) return;
+
+    flashlistRef.current.scrollToEnd({
+      animated: true,
+    });
+  }, []);
+
   const tap = Gesture.Tap().onStart(() => {
     runOnJS(onNext)();
   });
 
+  const longPress = Gesture.LongPress()
+    .onStart(() => {
+      runOnJS(scrollToEnd)();
+    })
+    .enabled(gesturesSettingsStore.settings.longPressNextButton);
+
   const pan = Gesture.Pan()
     .onStart(() => {
-      nextButtonTranslateXStart.value = nextButtonSharedValue.value;
+      nextButtonTranslateXStart.value = nextButtonSharedValueX.value;
+      nextButtonTranslateYStart.value = nextButtonSharedValueY.value;
     })
     .onUpdate((event) => {
-      nextButtonSharedValue.value =
+      nextButtonSharedValueX.value =
         event.translationX + nextButtonTranslateXStart.value;
+      nextButtonSharedValueY.value =
+        event.translationY + nextButtonTranslateYStart.value;
     })
     .onEnd((event) => {
-      const positionX = event.translationX + nextButtonSharedValue.value;
+      const positionX = event.translationX + nextButtonSharedValueX.value;
 
       if (positionX > width * 0.6) {
-        nextButtonSharedValue.value = withSpring(nextButtonPositions[2]);
+        nextButtonSharedValueX.value = withSpring(nextButtonPositions[2]);
         feedSelectorSharedValue.value = withSpring(feedSelectorPositions[0]);
         nextButtonPosition.value = "right";
       } else if (
         positionX < width * 0.3 &&
         nextButtonPosition.value !== "right"
       ) {
-        nextButtonSharedValue.value = withSpring(nextButtonPositions[0]);
+        nextButtonSharedValueX.value = withSpring(nextButtonPositions[0]);
         feedSelectorSharedValue.value = withSpring(feedSelectorPositions[1]);
         nextButtonPosition.value = "left";
       } else if (
         positionX < width * 0.3 &&
         nextButtonPosition.value !== "left"
       ) {
-        nextButtonSharedValue.value = withSpring(nextButtonPositions[1]);
+        nextButtonSharedValueX.value = withSpring(nextButtonPositions[1]);
         feedSelectorSharedValue.value = withSpring(feedSelectorPositions[1]);
         nextButtonPosition.value = "center";
       } else {
-        nextButtonSharedValue.value = withSpring(nextButtonPositions[1]);
+        nextButtonSharedValueX.value = withSpring(nextButtonPositions[1]);
         nextButtonPosition.value = "center";
       }
+      nextButtonSharedValueY.value = withSpring(0);
     })
     .onFinalize(() => {
-      runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Heavy);
-    });
+      runOnJS(hapticFeedback)();
+    })
+    .enabled((Platform.OS === "ios" || Platform.OS === "android") && isMobile);
 
-  const composed = Gesture.Race(pan, tap);
+  const composed = Gesture.Race(pan, tap, longPress);
 
   const themeMode = React.useMemo(() => {
     if (settingsStore.themeMode === "system") {
@@ -116,39 +142,10 @@ export default function Screen() {
     return settingsStore.themeMode;
   }, [settingsStore.themeMode, UnistylesRuntime.hasAdaptiveThemes]);
 
-  const paddingHorizontal = React.useMemo(() => {
-    if (settingsStore.themeMode === "system") {
-      return colorScheme;
-    }
-
-    return settingsStore.themeMode;
-  }, []);
-
-  async function test() {
-    try {
-      const response = await fetch(
-        "https://rss.app/feeds/th4bMZwtIxFdFzvk.xml"
-      );
-      const data = await response.text();
-      const parser = new XMLParser();
-      const jsonObj = parser.parse(data, {});
-
-      setTestData(jsonObj.rss.channel.item);
-
-      // console.log({ jsonObj: jsonObj.rss.channel.item[0] });
-    } catch (error) {
-      console.log({ error });
-    }
-  }
-
-  React.useEffect(() => {
-    test();
-  }, []);
-
   const onScroll = React.useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const index = Math.abs(
-        Math.floor(event.nativeEvent.contentOffset.y / 216)
+        Math.floor(event.nativeEvent.contentOffset.y / 226)
       );
       flashlistPositionIndex.value = index;
     },
@@ -157,7 +154,12 @@ export default function Screen() {
 
   const nextButtonAnimatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateX: nextButtonSharedValue.value }],
+      transform: [
+        { translateX: nextButtonSharedValueX.value },
+        {
+          translateY: nextButtonSharedValueY.value,
+        },
+      ],
     };
   }, []);
 
@@ -231,10 +233,10 @@ export default function Screen() {
       )}
       <View style={styles.content}>
         <FlashList
-          data={testData}
+          data={feedItemsQuery.data || []}
           keyExtractor={({ title }) => title}
           renderItem={({ item }) => <FeedCard feedItem={item} />}
-          estimatedItemSize={200}
+          estimatedItemSize={210}
           contentContainerStyle={{
             paddingTop: isMobile ? top + 12 : 54,
             paddingBottom: isMobile ? bottom + 100 : 150,
@@ -310,7 +312,7 @@ const stylesheet = createStyleSheet((theme) => ({
       [mq.only.width(480, 768)]: "6.25%",
       [mq.only.width(768, 1024)]: "7.5%",
       [mq.only.width(1024, 1440)]: (UnistylesRuntime.screen.width - 720) * 0.2,
-      [mq.only.width(1440)]: (UnistylesRuntime.screen.width - 920) * 0.4,
+      [mq.only.width(1440)]: (UnistylesRuntime.screen.width - 920) * 0.35,
     },
   },
   nextButton: {

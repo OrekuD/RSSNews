@@ -1,4 +1,4 @@
-import { createStyleSheet } from "react-native-unistyles";
+import { UnistylesRuntime, createStyleSheet } from "react-native-unistyles";
 
 const webDropdownStyleSheet = createStyleSheet((theme) => ({
   dropdownContent: {
@@ -7,8 +7,18 @@ const webDropdownStyleSheet = createStyleSheet((theme) => ({
     borderWidth: 1,
     borderRadius: 12,
     borderColor: theme.colors.borderColor,
+    maxHeight: UnistylesRuntime.screen.height * 0.677,
+    overflow: "scroll" as any,
   },
   dropdownItem: {
+    borderBottomWidth: 1,
+    borderColor: theme.colors.borderColor,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    gap: 4,
+    position: "relative",
+  },
+  dropdownCheckboxItem: {
     borderBottomWidth: 1,
     borderColor: theme.colors.borderColor,
     padding: 12,
@@ -42,6 +52,10 @@ const webDropdownStyleSheet = createStyleSheet((theme) => ({
   },
   dropdownTitle: {
     color: theme.colors.typography,
+    fontSize: 16,
+  },
+  dropdownDestructiveTitle: {
+    color: "#DC4138",
     fontSize: 16,
   },
   dropdownSubTitle: {

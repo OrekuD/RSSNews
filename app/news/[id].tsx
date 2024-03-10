@@ -1,6 +1,10 @@
 import useArticlesSettingsStore from "@/src/store/useArticlesSettingsStore";
 import { ScrollView, View } from "react-native";
 import { createStyleSheet, useStyles } from "react-native-unistyles";
+import { WebView } from "react-native-webview";
+
+let url =
+  "https://apnews.com/article/china-economy-congress-property-xi-jinping-a804bc4d0d9157fea88bef85b4d5e1af";
 
 export default function Screen() {
   const articlesSettingsStore = useArticlesSettingsStore();
@@ -19,7 +23,17 @@ export default function Screen() {
       ]}
     >
       <View style={styles.knob} />
-      <ScrollView></ScrollView>
+      {true ? (
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
+          <WebView style={styles.container} source={{ uri: url }} />
+        </View>
+      ) : (
+        <ScrollView></ScrollView>
+      )}
     </View>
   );
 }

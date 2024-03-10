@@ -1,4 +1,4 @@
-import { Switch, View } from "react-native";
+import { Platform, Switch, View } from "react-native";
 import { createStyleSheet, useStyles } from "react-native-unistyles";
 import Typography from "../Typography";
 
@@ -32,17 +32,21 @@ const gestures: Array<{
     title: "Drag Up Next Button",
     description: "scroll back up to the top of feeds",
   },
-  {
+];
+
+if (Platform.OS === "android" || Platform.OS === "ios") {
+  gestures.push({
     type: "shake-device",
     title: "Shake Device",
     description: "show smart summary",
-  },
-  {
+  });
+
+  gestures.push({
     type: "tilt-device",
     title: "Tilt Device",
     description: "scroll through feed",
-  },
-];
+  });
+}
 
 export default function GesturesSettings() {
   const { styles } = useStyles(stylesheet);
@@ -105,7 +109,7 @@ export default function GesturesSettings() {
             </View>
             <Switch
               value={getValue(gesture.type)}
-              onValueChange={(value) => {
+              onValueChange={() => {
                 gesturesSettingsStore.updateSetting(gesture.type);
               }}
               trackColor={{
